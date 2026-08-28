@@ -4,13 +4,13 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://proofchain.io"),
+  metadataBase: new URL("https://proofchain-omega.vercel.app"),
   title: "ProofChain Creative Provenance Registry",
   description: "Secure decentralized provenance and automated royalty splits for creative assets",
   openGraph: {
     title: "ProofChain Creative Provenance Registry",
     description: "Secure decentralized provenance and automated royalty splits for creative assets",
-    url: "https://proofchain.io",
+    url: "https://proofchain-omega.vercel.app",
     siteName: "ProofChain",
     locale: "en_US",
     type: "website",
@@ -39,7 +39,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               "@context": "https://schema.org",
               "@type": "WebSite",
               "name": "ProofChain",
-              "url": "https://proofchain.io",
+              "url": "https://proofchain-omega.vercel.app",
             }),
           }}
         />
