@@ -3,10 +3,11 @@
 import { useAppState } from "@/context/StateContext";
 import Sidebar from "@/components/dashboard/Sidebar";
 import React from "react";
-import { IconLock } from "@tabler/icons-react";
+import { IconLock, IconMenu2 } from "@tabler/icons-react";
 
 function PortalContent({ children }: { children: React.ReactNode }) {
   const { isConnected, connectWallet } = useAppState();
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
   const wallets = [
     { name: "MetaMask", role: "Alice (Creator)" },
@@ -50,12 +51,33 @@ function PortalContent({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-background text-text-primary flex">
+    <div className="min-h-screen bg-background text-text-primary flex flex-col lg:flex-row">
+      {/* Mobile Header */}
+      <header className="lg:hidden flex items-center justify-between px-6 h-16 bg-surface fixed top-0 left-0 right-0 z-30 select-none">
+        <span className="text-base font-light tracking-tight text-text-primary">
+          ProofChain
+        </span>
+        <button
+          onClick={() => setIsSidebarOpen(true)}
+          className="w-10 h-10 flex items-center justify-center bg-surface-active rounded-xl cursor-pointer text-text-primary"
+        >
+          <IconMenu2 size={20} strokeWidth={1.5} />
+        </button>
+      </header>
+
+      {/* Backdrop overlay */}
+      {isSidebarOpen && (
+        <div
+          onClick={() => setIsSidebarOpen(false)}
+          className="fixed inset-0 bg-black/60 z-35 lg:hidden transition-opacity duration-300"
+        />
+      )}
+
       {/* Sidebar Navigation */}
-      <Sidebar />
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       {/* Portal Workspace Content area */}
-      <main className="flex-1 ml-64 p-8 min-h-screen bg-background overflow-y-auto">
+      <main className="flex-1 ml-0 lg:ml-64 p-6 lg:p-8 pt-24 lg:pt-8 min-h-screen bg-background overflow-y-auto">
         {children}
       </main>
     </div>

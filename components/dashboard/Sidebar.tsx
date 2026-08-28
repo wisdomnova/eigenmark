@@ -11,9 +11,15 @@ import {
   IconNetwork,
   IconReceipt,
   IconArrowLeft,
+  IconX,
 } from "@tabler/icons-react";
 
-export default function Sidebar() {
+interface SidebarProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { users, currentUser, setCurrentUser } = useAppState();
@@ -40,18 +46,27 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="w-64 h-screen fixed top-0 left-0 bg-surface flex flex-col justify-between py-6 px-4 z-40 select-none">
+    <aside className={`w-64 h-screen fixed top-0 left-0 bg-surface flex flex-col justify-between py-6 px-4 z-40 select-none transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}>
       {/* Top Section */}
       <div>
-        {/* Brand Link */}
-        <div className="px-3 mb-6">
+        {/* Brand Link and Close Button */}
+        <div className="px-3 mb-6 flex justify-between items-center">
           <Link
             href="/"
+            onClick={onClose}
             className="text-lg font-light tracking-tight text-text-primary hover:text-brand transition-colors duration-200 cursor-pointer block"
           >
             ProofChain
           </Link>
-          <div className="w-full bg-surface-active/30 rounded-xl px-3 py-2 text-[10px] font-light text-text-muted mt-3 cursor-pointer">
+          <button
+            onClick={onClose}
+            className="lg:hidden w-8 h-8 flex items-center justify-center bg-surface-active rounded-xl cursor-pointer text-text-primary"
+          >
+            <IconX size={16} strokeWidth={1.5} />
+          </button>
+        </div>
+        <div className="px-3">
+          <div className="w-full bg-surface-active/30 rounded-xl px-3 py-2 text-[10px] font-light text-text-muted cursor-pointer text-left">
             Arbitrum Sepolia Testnet
           </div>
         </div>
@@ -69,6 +84,7 @@ export default function Sidebar() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={onClose}
                   className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-light tracking-wide transition-all duration-200 cursor-pointer ${
                     isActive
                       ? "bg-brand text-background"
