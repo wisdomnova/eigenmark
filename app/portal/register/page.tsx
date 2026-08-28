@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useAppState } from "@/context/StateContext";
 import RegisterForm from "@/components/dashboard/RegisterForm";
 import { useRouter } from "next/navigation";
@@ -8,7 +9,9 @@ export default function RegisterPage() {
   const { currentUser, registerAsset, assets } = useAppState();
   const router = useRouter();
 
-  const handleRegister = (newAsset: {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleRegister = async (newAsset: {
     title: string;
     description: string;
     aiModel: string;
@@ -16,8 +19,15 @@ export default function RegisterPage() {
     royaltySplit: number;
     creatorAddress: string;
   }) => {
-    registerAsset(newAsset);
-    router.push("/portal/graph");
+    try {
+      setIsSubmitting(true);
+      await registerAsset(newAsset);
+      router.push("/portal/graph");
+    } catch (error) {
+      console.error("Registration failed:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -27,6 +37,7 @@ export default function RegisterPage() {
         onRegister={handleRegister}
         assets={assets}
         isDeriving={false}
+        isSubmitting={isSubmitting}
       />
     </div>
   );

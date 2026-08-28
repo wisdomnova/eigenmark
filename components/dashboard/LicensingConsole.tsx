@@ -35,7 +35,7 @@ interface LicensingConsoleProps {
     licenseeAddress: string;
     price: number;
     royaltySplit: number;
-  }) => void;
+  }) => Promise<void>;
 }
 
 export default function LicensingConsole({
@@ -53,43 +53,39 @@ export default function LicensingConsole({
   // Find derivative assets (those with parents)
   const derivatives = assets.filter((a) => a.parentId);
 
-  const handlePurchase = () => {
+  const handlePurchase = async () => {
     if (!selectedAssetId) return;
 
     const selectedAsset = assets.find((a) => a.id === selectedAssetId);
     if (!selectedAsset) return;
 
     setIsProcessing(true);
-    setLogs([]);
-    setCurrentStep(1);
-
-    const steps = [
+    setLogs([
       "Connecting wallet and checking testnet USDC balance",
-      "Approving smart contract to spend 10 USDC on your behalf",
-      "Broadcasting buyLicense transaction to Arbitrum Sepolia",
-      `Resolving parent royalty split of ${selectedAsset.royaltySplit}%`,
-      `Transferring payment splits: ${price * (selectedAsset.royaltySplit / 100)} USDC to primary creator, ${price * (1 - selectedAsset.royaltySplit / 100)} USDC to derivative creator`,
-      "Mining block and writing license record to the immutable ledger",
-      "License purchase successful, event logs emitted",
-    ];
-
-    let logIndex = 0;
-    const interval = setInterval(() => {
-      if (logIndex < steps.length) {
-        setLogs((prev) => [...prev, steps[logIndex]]);
-        setCurrentStep(logIndex + 1);
-        logIndex++;
-      } else {
-        clearInterval(interval);
-        onBuyLicense({
-          assetId: selectedAssetId,
-          licenseeAddress: currentUser.address,
-          price: price,
-          royaltySplit: selectedAsset.royaltySplit,
-        });
-        setIsProcessing(false);
-      }
-    }, 1000);
+      "Please confirm the smart contract transaction in your wallet..."
+    ]);
+    
+    try {
+      await onBuyLicense({
+        assetId: selectedAssetId,
+        licenseeAddress: currentUser.address,
+        price: price,
+        royaltySplit: selectedAsset.royaltySplit,
+      });
+      
+      setLogs((prev) => [
+        ...prev,
+        `Resolving parent royalty split of ${selectedAsset.royaltySplit}%`,
+        `Transferring payment splits: ${price * (selectedAsset.royaltySplit / 100)} USDC to primary creator, ${price * (1 - selectedAsset.royaltySplit / 100)} USDC to derivative creator`,
+        "Mining block and writing license record to the immutable ledger",
+        "License purchase successful, event logs emitted",
+      ]);
+    } catch (error) {
+      console.error("Purchase failed:", error);
+      setLogs((prev) => [...prev, "Transaction rejected or failed."]);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const getParentCreatorName = (assetId: string) => {

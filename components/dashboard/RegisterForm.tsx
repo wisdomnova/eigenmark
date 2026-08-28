@@ -16,6 +16,7 @@ interface RegisterFormProps {
   }) => void;
   assets: Array<{ id: string; title: string; contentHash: string }>;
   isDeriving?: boolean;
+  isSubmitting?: boolean;
 }
 
 export default function RegisterForm({
@@ -23,6 +24,7 @@ export default function RegisterForm({
   onRegister,
   assets,
   isDeriving = false,
+  isSubmitting = false,
 }: RegisterFormProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -263,14 +265,14 @@ export default function RegisterForm({
         {/* Submit */}
         <button
           type="submit"
-          disabled={!fileHash || !title}
+          disabled={!fileHash || !title || isSubmitting}
           className={`w-full py-4 text-sm font-normal text-background rounded-full transition-colors duration-200 cursor-pointer mt-4 ${
-            fileHash && title
+            fileHash && title && !isSubmitting
               ? "bg-brand hover:bg-text-primary"
               : "bg-surface-active/50 text-text-muted cursor-not-allowed"
           }`}
         >
-          Anchor Record on Chain
+          {isSubmitting ? "Confirm in Wallet..." : "Anchor Record on Chain"}
         </button>
       </form>
     </div>
