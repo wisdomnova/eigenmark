@@ -2,11 +2,11 @@
 
 export default function PartnerList() {
   const partners = [
-    "Ethereum Testnet",
-    "OpenAI Models",
-    "Creative Commons",
     "Arbitrum Sepolia",
-    "Base Network",
+    "Supabase Storage",
+    "PostgreSQL Database",
+    "Model Context Protocol",
+    "Next.js App Router",
   ];
 
   return (

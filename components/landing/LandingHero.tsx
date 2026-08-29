@@ -65,83 +65,89 @@ export default function LandingHero({ onEnterPortal }: LandingHeroProps) {
       </header>
 
       {/* Hero Copy */}
-      <div className="max-w-4xl mt-16 flex flex-col items-center">
-        <span className="text-xs uppercase tracking-wider text-brand font-normal mb-4">
-          Digital media provenance protocol
+      <div className="max-w-5xl mt-16 flex flex-col items-center">
+        <span className="text-xs uppercase tracking-widest text-brand font-normal mb-4">
+          verifiable rights layer for digital content
         </span>
-        <h1 className="text-4xl sm:text-6xl font-light tracking-tight text-text-primary leading-tight mb-6">
-          Verifiable provenance and licensing for creative media
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight text-text-primary leading-tight mb-6">
+          The machine verifiable rights layer built for AI agents
         </h1>
-        <p className="text-base sm:text-lg font-light text-text-muted max-w-2xl leading-relaxed mb-8">
-          Register assets, document creative lineage, establish permissions, and secure automated splits. ProofChain makes media licensing completely trustless.
+        <p className="text-sm sm:text-base font-light text-text-muted max-w-3xl leading-relaxed mb-8">
+          ProofChain registers assets, computes visual and cryptographic signatures, uploads media to serverless storage, and exposes standard rights interfaces to AI agents using the Model Context Protocol.
         </p>
 
         {/* Call to Action Button */}
         <div className="flex items-center gap-4 mb-16">
           <button
             onClick={handleAction}
-            className="px-8 py-3 text-base font-light text-background bg-brand hover:bg-text-primary hover:text-background transition-colors duration-200 rounded-full cursor-pointer"
+            className="px-8 py-3.5 text-xs uppercase tracking-wider font-mono text-background bg-brand hover:bg-text-primary hover:text-background transition-colors duration-200 rounded-full cursor-pointer"
           >
-            {isConnected ? "Launch Application" : "Connect Web3 Wallet"}
+            {isConnected ? "Launch Portal Console" : "Connect Web3 Wallet"}
           </button>
         </div>
 
         {/* Minimalist Visual Representation of Provenance */}
-        <div className="w-full max-w-3xl bg-surface rounded-3xl p-8 flex flex-col items-center justify-center gap-8">
-          <div className="w-full flex flex-col sm:flex-row items-center justify-around gap-6">
+        <div className="w-full max-w-4xl bg-surface rounded-3xl p-8 flex flex-col items-center justify-center gap-6">
+          <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-6">
             
-            {/* Alice's Original Node */}
-            <div className="w-64 bg-surface-active p-6 rounded-2xl text-left">
-              <span className="text-xs uppercase tracking-widest text-brand font-normal block mb-2">
-                Original Asset
-              </span>
-              <h3 className="text-lg font-light text-text-primary mb-1">
-                Alice Creative Work
-              </h3>
-              <p className="text-xs font-mono text-text-muted truncate">
-                0x7f23a91bc90d1f43a...
-              </p>
-              <div className="mt-4 flex justify-between items-center text-xs text-text-muted">
-                <span>License: Commercial</span>
-                <span className="text-success">Verified</span>
+            {/* Step 1: Upload and Hash */}
+            <div className="bg-surface-active p-6 rounded-2xl text-left flex flex-col justify-between min-h-[160px]">
+              <div>
+                <span className="text-[10px] uppercase tracking-widest text-brand font-normal block mb-2 font-mono">
+                  01 Media Hash
+                </span>
+                <h3 className="text-sm font-normal text-text-primary mb-1">
+                  Local Perceptual Signatures
+                </h3>
+                <p className="text-[11px] font-light text-text-muted leading-relaxed">
+                  Computes SHA 256 and visual pHash in browser. Uploads media to Supabase storage.
+                </p>
+              </div>
+              <div className="text-[10px] font-mono text-success mt-4">
+                Verify Complete
               </div>
             </div>
 
-            {/* Lineage Connector Arrow */}
-            <div className="w-16 h-8 flex items-center justify-center text-text-muted">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              >
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
+            {/* Step 2: Smart Contract Ledger */}
+            <div className="bg-surface-active p-6 rounded-2xl text-left flex flex-col justify-between min-h-[160px]">
+              <div>
+                <span className="text-[10px] uppercase tracking-widest text-brand font-normal block mb-2 font-mono">
+                  02 Ledger Registry
+                </span>
+                <h3 className="text-sm font-normal text-text-primary mb-1">
+                  Smart Contract Splits
+                </h3>
+                <p className="text-[11px] font-light text-text-muted leading-relaxed">
+                  Solidity contracts automatically split licensing fees between parent and derivative creators.
+                </p>
+              </div>
+              <div className="text-[10px] font-mono text-brand mt-4">
+                Arbitrum Sepolia Active
+              </div>
             </div>
 
-            {/* Bob's Derivative Node */}
-            <div className="w-64 bg-surface-active p-6 rounded-2xl text-left">
-              <span className="text-xs uppercase tracking-widest text-brand font-normal block mb-2">
-                Derivative Remix
-              </span>
-              <h3 className="text-lg font-light text-text-primary mb-1">
-                Bob Derivative Work
-              </h3>
-              <p className="text-xs font-mono text-text-muted truncate">
-                0x91bc83af10df20c9...
-              </p>
-              <div className="mt-4 flex justify-between items-center text-xs text-text-muted">
-                <span>Royalty Split: 10% Alice</span>
-                <span className="text-brand">Active</span>
+            {/* Step 3: MCP Agent Interface */}
+            <div className="bg-surface-active p-6 rounded-2xl text-left flex flex-col justify-between min-h-[160px]">
+              <div>
+                <span className="text-[10px] uppercase tracking-widest text-brand font-normal block mb-2 font-mono">
+                  03 Agent Access
+                </span>
+                <h3 className="text-sm font-normal text-text-primary mb-1">
+                  Model Context Protocol
+                </h3>
+                <p className="text-[11px] font-light text-text-muted leading-relaxed">
+                  Exposes stateless tools for AI agents to query provenance, verify rights, and settle royalties.
+                </p>
+              </div>
+              <div className="text-[10px] font-mono text-text-muted mt-4">
+                Stdio Server Ready
               </div>
             </div>
 
           </div>
 
-          <div className="text-xs font-mono text-text-muted bg-surface-active/50 px-4 py-2 rounded-full">
-            Smart contract settlement automatically executes payments
+          <div className="text-[10px] font-mono text-text-muted bg-surface-active/50 px-4 py-2 rounded-full mt-2">
+            Verifiable provenance infrastructure enabling autonomous licensing settlement
           </div>
         </div>
       </div>

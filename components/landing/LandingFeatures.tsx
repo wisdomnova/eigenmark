@@ -3,22 +3,22 @@
 export default function LandingFeatures() {
   const features = [
     {
-      title: "Immutable Identity",
+      title: "Perceptual Visual Signatures",
       description:
-        "Verify original creators using cryptographic asset hashing. Prove registration timing and state without revealing raw file contents.",
-      label: "Provenance",
+        "Extract grayscale and DCT coefficients client side to compute a visual perceptual hash. Compare visual Hamming distances in SQL to alert creators of derivative uploads before anchoring records.",
+      label: "Provenance Intelligence",
     },
     {
-      title: "Verifiable Lineage",
+      title: "Stateless Agent Tools",
       description:
-        "Document relationships between original assets and derivative works. Establish a clear lineage record for remixes, modifications, and samplings.",
-      label: "Attribution",
+        "Expose registry access directly to autonomous workflows. AI agents query asset details, verify usage allowances, check parent origins, and prepare transaction calldata using the Model Context Protocol.",
+      label: "Model Context Protocol",
     },
     {
-      title: "Automated Splits",
+      title: "On Chain Splits Settlement",
       description:
-        "Execute secondary royalty distributions automatically on chain. Smart contracts handle payments directly, split according to terms set at registration.",
-      label: "Settlement",
+        "Enforce parent royalty splits directly in smart contract logic. Licensing payments trigger instant trustless transfers distributed directly on chain to parent and derivative wallets.",
+      label: "EVM Smart Contract",
     },
   ];
 
