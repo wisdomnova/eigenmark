@@ -16,6 +16,7 @@ export interface Asset {
   royaltySplit: number;
   creatorAddress: string;
   parentId?: string;
+  phash?: string;
   timestamp: string;
   transactionHash: string;
 }
@@ -53,6 +54,7 @@ interface StateContextType {
     royaltySplit: number;
     creatorAddress: string;
     parentId?: string;
+    phash?: string;
   }) => Promise<string>;
   buyLicense: (agreement: {
     assetId: string;
@@ -96,6 +98,7 @@ function StateProviderContent({ children }: { children: ReactNode }) {
       contentHash: "0xab12c345de6789f01234567890abcdef1234567890abcdef1234567890ab1234",
       royaltySplit: 10,
       creatorAddress: "0x1111111111111111111111111111111111111111",
+      phash: "0f0f0f0f0f0f0f0f",
       timestamp: "22 Aug 2026 18:12",
       transactionHash: "0x892a3bc90de12c43abef9023ab90d34e902bc345d90e20c90f23a91bc90d1f43",
     },
@@ -108,6 +111,7 @@ function StateProviderContent({ children }: { children: ReactNode }) {
       royaltySplit: 10,
       creatorAddress: "0x2222222222222222222222222222222222222222",
       parentId: "1",
+      phash: "0f0f0f0f0f0f0f00",
       timestamp: "23 Aug 2026 09:30",
       transactionHash: "0x91bc83af10df20c908f23a91bc90d1f43a91bc90de12c43abef9023ab90d34e90",
     },
@@ -150,6 +154,7 @@ function StateProviderContent({ children }: { children: ReactNode }) {
     royaltySplit: number;
     creatorAddress: string;
     parentId?: string;
+    phash?: string;
   }) => {
     let txHash = "0x" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 

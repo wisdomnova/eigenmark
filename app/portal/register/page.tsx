@@ -18,6 +18,7 @@ export default function RegisterPage() {
     contentHash: string;
     royaltySplit: number;
     creatorAddress: string;
+    phash: string;
   }) => {
     try {
       setIsSubmitting(true);

@@ -18,6 +18,7 @@ export default function DerivePage() {
     royaltySplit: number;
     creatorAddress: string;
     parentId?: string;
+    phash: string;
   }) => {
     try {
       setIsSubmitting(true);
