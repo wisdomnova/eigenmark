@@ -11,6 +11,7 @@ interface Asset {
   royaltySplit: number;
   creatorAddress: string;
   parentId?: string;
+  mediaUrl?: string;
   timestamp: string;
   transactionHash: string;
 }
@@ -157,6 +158,15 @@ export default function VerifyPanel({ assets }: VerifyPanelProps) {
           <div className="text-left">
             {verifiedAsset ? (
               <div className="bg-surface-active/50 p-6 rounded-2xl flex flex-col gap-4">
+                {verifiedAsset.mediaUrl && (
+                  <div className="w-full h-44 overflow-hidden rounded-2xl bg-background border border-surface-active/50 flex items-center justify-center">
+                    <img 
+                      src={verifiedAsset.mediaUrl} 
+                      alt={verifiedAsset.title} 
+                      className="max-w-full max-h-full object-contain"
+                    />
+                  </div>
+                )}
                 <div className="flex justify-between items-start">
                   <div>
                     <span className="text-[10px] uppercase tracking-widest text-success font-normal block mb-1">

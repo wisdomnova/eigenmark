@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Dropdown from "@/components/ui/Dropdown";
+import { supabase } from "@/lib/supabase";
 
 interface RegisterFormProps {
   currentUser: { name: string; address: string; role: string };
@@ -14,8 +15,9 @@ interface RegisterFormProps {
     creatorAddress: string;
     parentId?: string;
     phash: string;
+    mediaUrl?: string;
   }) => void;
-  assets: Array<{ id: string; title: string; contentHash: string; phash?: string }>;
+  assets: Array<{ id: string; title: string; contentHash: string; phash?: string; mediaUrl?: string }>;
   isDeriving?: boolean;
   isSubmitting?: boolean;
 }
@@ -129,7 +131,9 @@ export default function RegisterForm({
   const [fileHash, setFileHash] = useState("");
   const [phash, setPhash] = useState("");
   const [fileName, setFileName] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isHashing, setIsHashing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [detectedParent, setDetectedParent] = useState<{ id: string; title: string; similarity: number } | null>(null);
 
   const calculateHammingDistance = (hex1: string, hex2: string): number => {
@@ -206,6 +210,7 @@ export default function RegisterForm({
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
       setFileName(file.name);
+      setSelectedFile(file);
       processFile(file);
     }
   };
@@ -214,13 +219,39 @@ export default function RegisterForm({
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setFileName(file.name);
+      setSelectedFile(file);
       processFile(file);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fileHash || !title) return;
+    if (!fileHash || !title || !selectedFile) return;
+
+    setIsUploading(true);
+    let mediaUrl = "";
+    try {
+      const fileExt = selectedFile.name.split(".").pop();
+      const filePath = `${fileHash}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from("assets")
+        .upload(filePath, selectedFile, {
+          cacheControl: "3600",
+          upsert: true,
+        });
+
+      if (!uploadError) {
+        const { data } = supabase.storage.from("assets").getPublicUrl(filePath);
+        mediaUrl = data.publicUrl;
+      } else {
+        console.error("Storage upload error:", uploadError.message);
+      }
+    } catch (err) {
+      console.error("Upload process failed:", err);
+    } finally {
+      setIsUploading(false);
+    }
 
     onRegister({
       title,
@@ -231,6 +262,7 @@ export default function RegisterForm({
       creatorAddress: currentUser.address,
       parentId: isDeriving && parentId ? parentId : undefined,
       phash: phash,
+      mediaUrl: mediaUrl || undefined,
     });
 
     // Reset form
@@ -240,6 +272,8 @@ export default function RegisterForm({
     setPhash("");
     setFileName("");
     setParentId("");
+    setSelectedFile(null);
+    setDetectedParent(null);
   };
 
   const aiOptions = [
@@ -442,14 +476,14 @@ export default function RegisterForm({
         {/* Submit */}
         <button
           type="submit"
-          disabled={!fileHash || !title || isSubmitting}
+          disabled={!fileHash || !title || isSubmitting || isUploading}
           className={`w-full py-4 text-sm font-normal text-background rounded-full transition-colors duration-200 cursor-pointer mt-4 ${
-            fileHash && title && !isSubmitting
+            fileHash && title && !isSubmitting && !isUploading
               ? "bg-brand hover:bg-text-primary"
               : "bg-surface-active/50 text-text-muted cursor-not-allowed"
           }`}
         >
-          {isSubmitting ? "Confirm in Wallet..." : "Anchor Record on Chain"}
+          {isUploading ? "Uploading Media..." : (isSubmitting ? "Confirm in Wallet..." : "Anchor Record on Chain")}
         </button>
       </form>
     </div>

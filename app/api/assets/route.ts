@@ -7,7 +7,7 @@ export async function GET() {
       `SELECT id, content_hash as "contentHash", title, description, 
               creator_address as "creatorAddress", ai_model as "aiModel", 
               license_terms_hash as "licenseTermsHash", parent_hash as "parentId", 
-              phash, royalty_split as "royaltySplit", created_at as timestamp 
+              phash, royalty_split as "royaltySplit", media_url as "mediaUrl", created_at as timestamp 
        FROM assets 
        ORDER BY id ASC`
     );
@@ -48,6 +48,7 @@ export async function POST(request: Request) {
       royaltySplit,
       parentId, // parent_hash
       phash,
+      mediaUrl,
     } = await request.json();
 
     if (!title || !contentHash || !creatorAddress || !phash) {
@@ -58,12 +59,12 @@ export async function POST(request: Request) {
     }
 
     const res = await pool.query(
-      `INSERT INTO assets (content_hash, title, description, creator_address, ai_model, license_terms_hash, parent_hash, phash, royalty_split)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `INSERT INTO assets (content_hash, title, description, creator_address, ai_model, license_terms_hash, parent_hash, phash, royalty_split, media_url)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
        RETURNING id, content_hash as "contentHash", title, description, 
                  creator_address as "creatorAddress", ai_model as "aiModel", 
                  license_terms_hash as "licenseTermsHash", parent_hash as "parentId", 
-                 phash, royalty_split as "royaltySplit", created_at as timestamp`,
+                 phash, royalty_split as "royaltySplit", media_url as "mediaUrl", created_at as timestamp`,
       [
         contentHash,
         title,
@@ -74,6 +75,7 @@ export async function POST(request: Request) {
         parentId || null,
         phash,
         royaltySplit || 10.00,
+        mediaUrl || null,
       ]
     );
 

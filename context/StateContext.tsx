@@ -17,6 +17,7 @@ export interface Asset {
   creatorAddress: string;
   parentId?: string;
   phash?: string;
+  mediaUrl?: string;
   timestamp: string;
   transactionHash: string;
 }
@@ -55,6 +56,7 @@ interface StateContextType {
     creatorAddress: string;
     parentId?: string;
     phash?: string;
+    mediaUrl?: string;
   }) => Promise<string>;
   buyLicense: (agreement: {
     assetId: string;
@@ -238,6 +240,7 @@ function StateProviderContent({ children }: { children: ReactNode }) {
     creatorAddress: string;
     parentId?: string;
     phash?: string;
+    mediaUrl?: string;
   }) => {
     let txHash = "0x" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
@@ -277,6 +280,7 @@ function StateProviderContent({ children }: { children: ReactNode }) {
           creatorAddress: newAsset.creatorAddress,
           parentId: newAsset.parentId,
           phash: newAsset.phash || "0000000000000000",
+          mediaUrl: newAsset.mediaUrl || null,
         }),
       });
 
