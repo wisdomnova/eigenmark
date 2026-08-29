@@ -11,20 +11,20 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS assets (
   id SERIAL PRIMARY KEY,
-  content_hash VARCHAR(64) UNIQUE NOT NULL,
+  content_hash VARCHAR(66) UNIQUE NOT NULL,
   title VARCHAR(255) NOT NULL,
   description TEXT,
   creator_address VARCHAR(42) NOT NULL,
   ai_model VARCHAR(100),
-  license_terms_hash VARCHAR(64) NOT NULL,
-  parent_hash VARCHAR(64) REFERENCES assets(content_hash),
+  license_terms_hash VARCHAR(66) NOT NULL,
+  parent_hash VARCHAR(66) REFERENCES assets(content_hash),
   phash VARCHAR(16) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS licensing_agreements (
   id SERIAL PRIMARY KEY,
-  asset_hash VARCHAR(64) REFERENCES assets(content_hash),
+  asset_hash VARCHAR(66) REFERENCES assets(content_hash),
   licensee_address VARCHAR(42) NOT NULL,
   transaction_hash VARCHAR(66) UNIQUE NOT NULL,
   price NUMERIC(20, 6) NOT NULL,

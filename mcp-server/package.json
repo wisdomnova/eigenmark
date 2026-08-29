@@ -1,0 +1,15 @@
+{
+  "name": "proofchain-mcp-server",
+  "version": "1.0.0",
+  "description": "ProofChain Model Context Protocol (MCP) Server for AI Agents",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.1",
+    "pg": "^8.11.3",
+    "dotenv": "^16.4.5"
+  }
+}
