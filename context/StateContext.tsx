@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { WagmiProvider, useAccount, useConnect, useDisconnect, useWriteContract } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { config } from "@/context/wagmi";
@@ -119,6 +119,60 @@ function StateProviderContent({ children }: { children: ReactNode }) {
 
   const [agreements, setAgreements] = useState<Array<LicensingAgreement>>([]);
 
+  // Database synchronization: load initial records on mount
+  useEffect(() => {
+    async function loadInitialData() {
+      try {
+        const assetsRes = await fetch("/api/assets");
+        let loadedAssets: Array<Asset> = [];
+        if (assetsRes.ok) {
+          loadedAssets = await assetsRes.json();
+          setAssets(loadedAssets);
+        }
+
+        const agreementsRes = await fetch("/api/agreements");
+        if (agreementsRes.ok) {
+          const agreementsData = await agreementsRes.json();
+          // Map asset contentHash back to asset.id for UI elements
+          const mappedAgreements = agreementsData.map((agreement: any) => {
+            const matchedAsset = loadedAssets.find((a) => a.contentHash === agreement.assetId);
+            return {
+              ...agreement,
+              assetId: matchedAsset ? matchedAsset.id : agreement.assetId,
+            };
+          });
+          setAgreements(mappedAgreements);
+        }
+      } catch (err) {
+        console.error("Failed to load initial database records:", err);
+      }
+    }
+    loadInitialData();
+  }, []);
+
+  // Database synchronization: register connected wallet profile
+  useEffect(() => {
+    async function registerOrCheckUser() {
+      if (!currentUser || !currentUser.address) return;
+      try {
+        await fetch("/api/users", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            walletAddress: currentUser.address,
+            name: currentUser.name,
+            role: currentUser.role,
+          }),
+        });
+      } catch (err) {
+        console.error("User registration check failed:", err);
+      }
+    }
+    registerOrCheckUser();
+  }, [currentUser]);
+
   const connectWallet = (walletName: string) => {
     // If client has an injected provider, connect it, else run fallback mock
     const targetConnector = connectors.find(
@@ -178,6 +232,35 @@ function StateProviderContent({ children }: { children: ReactNode }) {
       }
     }
 
+    // Save registration details to persistent database
+    try {
+      const response = await fetch("/api/assets", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: newAsset.title,
+          description: newAsset.description,
+          aiModel: newAsset.aiModel,
+          contentHash: newAsset.contentHash,
+          royaltySplit: newAsset.royaltySplit,
+          creatorAddress: newAsset.creatorAddress,
+          parentId: newAsset.parentId,
+          phash: newAsset.phash || "0000000000000000",
+        }),
+      });
+
+      if (response.ok) {
+        const savedAsset = await response.json();
+        setAssets((prev) => [...prev, savedAsset]);
+        return savedAsset.id;
+      }
+    } catch (err) {
+      console.error("Failed to persist asset in database:", err);
+    }
+
+    // Fallback: local memory insert
     const nextId = String(assets.length + 1);
     const formattedAsset: Asset = {
       ...newAsset,
@@ -209,7 +292,6 @@ function StateProviderContent({ children }: { children: ReactNode }) {
 
     if (isWalletConnected && asset) {
       try {
-        // Transfer 0.001 ETH as mockup for USDC pricing split on testnet
         const hash = await writeContractAsync({
           address: contractAddress,
           abi: contractAbi,
@@ -223,6 +305,35 @@ function StateProviderContent({ children }: { children: ReactNode }) {
       }
     }
 
+    // Save licensing transaction to database
+    try {
+      const response = await fetch("/api/agreements", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          assetId: asset ? asset.contentHash : agreement.assetId,
+          licenseeAddress: agreement.licenseeAddress,
+          transactionHash: txHash,
+          price: agreement.price,
+          royaltySplit: agreement.royaltySplit,
+        }),
+      });
+
+      if (response.ok) {
+        const savedAgreement = await response.json();
+        if (asset) {
+          savedAgreement.assetId = asset.id;
+        }
+        setAgreements((prev) => [...prev, savedAgreement]);
+        return;
+      }
+    } catch (err) {
+      console.error("Failed to persist agreement in database:", err);
+    }
+
+    // Fallback: local memory insert
     const newAgreement: LicensingAgreement = {
       ...agreement,
       id: String(agreements.length + 1),

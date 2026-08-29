@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS assets (
   license_terms_hash VARCHAR(66) NOT NULL,
   parent_hash VARCHAR(66) REFERENCES assets(content_hash),
   phash VARCHAR(16) NOT NULL,
+  royalty_split NUMERIC(5, 2) DEFAULT 10.00 NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
