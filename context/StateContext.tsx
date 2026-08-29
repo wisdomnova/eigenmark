@@ -44,7 +44,7 @@ interface StateContextType {
   assets: Array<Asset>;
   agreements: Array<LicensingAgreement>;
   isConnected: boolean;
-  connectWallet: (walletName: string) => void;
+  connectWallet: (connectorOrName: any) => void;
   disconnectWallet: () => void;
   registerAsset: (asset: {
     title: string;
@@ -84,10 +84,7 @@ function StateProviderContent({ children }: { children: ReactNode }) {
   const { writeContractAsync } = useWriteContract();
 
   const isConnected = isWalletConnected || isConnectedMock;
-  
-  const currentUser: User = isWalletConnected
-    ? { name: "Web3 User", address: walletAddress || "0x0000000000000000000000000000000000000000", role: "Active Operator" }
-    : currentUserMock;
+  const [currentUser, setCurrentUser] = useState<User>(users[0]);
 
   const [assets, setAssets] = useState<Array<Asset>>([
     {
@@ -150,38 +147,70 @@ function StateProviderContent({ children }: { children: ReactNode }) {
     loadInitialData();
   }, []);
 
-  // Database synchronization: register connected wallet profile
+  // Database synchronization: register connected wallet profile or handle mocks
   useEffect(() => {
     async function registerOrCheckUser() {
-      if (!currentUser || !currentUser.address) return;
-      try {
-        await fetch("/api/users", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            walletAddress: currentUser.address,
-            name: currentUser.name,
-            role: currentUser.role,
-          }),
-        });
-      } catch (err) {
-        console.error("User registration check failed:", err);
+      if (isWalletConnected && walletAddress) {
+        try {
+          const response = await fetch("/api/users", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              walletAddress: walletAddress,
+              name: "Web3 User",
+              role: "Active Operator",
+            }),
+          });
+
+          if (response.ok) {
+            const dbUser = await response.json();
+            setCurrentUser({
+              name: dbUser.name,
+              address: dbUser.wallet_address,
+              role: dbUser.role,
+            });
+          } else {
+            setCurrentUser({
+              name: "Web3 User",
+              address: walletAddress,
+              role: "Active Operator",
+            });
+          }
+        } catch (err) {
+          console.error("User registration check failed:", err);
+          setCurrentUser({
+            name: "Web3 User",
+            address: walletAddress,
+            role: "Active Operator",
+          });
+        }
+      } else {
+        // Fallback to mock user profile
+        setCurrentUser(currentUserMock);
       }
     }
     registerOrCheckUser();
-  }, [currentUser]);
+  }, [walletAddress, isWalletConnected, currentUserMock]);
 
-  const connectWallet = (walletName: string) => {
-    // If client has an injected provider, connect it, else run fallback mock
+  const connectWallet = (connectorOrName: any) => {
+    // If it's a connector object (passed from portal list), connect it directly
+    if (connectorOrName && typeof connectorOrName === "object" && connectorOrName.connect) {
+      connect({ connector: connectorOrName });
+      return;
+    }
+
+    const walletName = String(connectorOrName);
+    // Find connector by name (case-insensitive)
     const targetConnector = connectors.find(
-      (c) => c.name.toLowerCase() === walletName.toLowerCase() || c.id === "injected"
+      (c) => c.name.toLowerCase() === walletName.toLowerCase() || c.id.toLowerCase() === walletName.toLowerCase()
     );
 
-    if (targetConnector && typeof window !== "undefined" && (window as any).ethereum) {
+    if (targetConnector) {
       connect({ connector: targetConnector });
     } else {
+      // Fallback: connect mock user for demonstration
       setIsConnectedMock(true);
       if (walletName === "MetaMask") {
         setCurrentUserMock(users[0]); // Alice

@@ -22,7 +22,7 @@ interface SidebarProps {
 export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { users, currentUser, setCurrentUser } = useAppState();
+  const { users, currentUser, setCurrentUser, disconnectWallet } = useAppState();
 
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -153,6 +153,17 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                   </span>
                 </button>
               ))}
+              <div className="border-t border-surface my-1.5"></div>
+              <button
+                type="button"
+                onClick={() => {
+                  disconnectWallet();
+                  setIsUserMenuOpen(false);
+                }}
+                className="w-full px-3 py-2 text-left text-[10px] font-light text-brand hover:bg-surface/70 transition-colors duration-150 cursor-pointer"
+              >
+                Disconnect Wallet Session
+              </button>
             </div>
           )}
         </div>

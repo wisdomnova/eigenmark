@@ -4,15 +4,17 @@ import { useAppState } from "@/context/StateContext";
 import Sidebar from "@/components/dashboard/Sidebar";
 import React from "react";
 import { IconLock, IconMenu2 } from "@tabler/icons-react";
+import { useConnect } from "wagmi";
 
 function PortalContent({ children }: { children: React.ReactNode }) {
   const { isConnected, connectWallet } = useAppState();
+  const { connectors } = useConnect();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
-  const wallets = [
-    { name: "MetaMask", role: "Alice (Creator)" },
-    { name: "Coinbase Wallet", role: "Bob (Remixer)" },
-    { name: "WalletConnect", role: "Charlie (Buyer)" },
+  const mockProfiles = [
+    { name: "MetaMask", role: "Alice (Creator Profile)" },
+    { name: "Coinbase Wallet", role: "Bob (Remixer Profile)" },
+    { name: "WalletConnect", role: "Charlie (Buyer Profile)" },
   ];
 
   if (!isConnected) {
@@ -31,19 +33,49 @@ function PortalContent({ children }: { children: React.ReactNode }) {
             Please connect your Web3 wallet to authorize secure access to the creative registry and contract logs.
           </p>
 
-          <div className="flex flex-col gap-2.5 w-full">
-            {wallets.map((wallet) => (
-              <button
-                key={wallet.name}
-                onClick={() => connectWallet(wallet.name)}
-                className="w-full py-4 px-4 bg-surface-active hover:bg-brand hover:text-background text-left text-xs font-light text-text-primary rounded-xl cursor-pointer transition-all duration-200 flex justify-between items-center"
-              >
-                <span>{wallet.name}</span>
-                <span className="text-[9px] opacity-80 uppercase tracking-wider font-mono">
-                  {wallet.role}
-                </span>
-              </button>
-            ))}
+          {/* 1. Live Wallet Connections */}
+          <div className="w-full mb-6">
+            <div className="text-[10px] font-normal uppercase tracking-wider text-text-muted mb-3 text-left">
+              Live Wallet Connection
+            </div>
+            <div className="flex flex-col gap-2 w-full">
+              {connectors.map((connector) => (
+                <button
+                  key={connector.id}
+                  onClick={() => connectWallet(connector)}
+                  className="w-full py-4 px-4 bg-surface-active hover:bg-brand hover:text-background text-left text-xs font-light text-text-primary rounded-xl cursor-pointer transition-all duration-200 flex justify-between items-center"
+                >
+                  <span>{connector.name}</span>
+                  <span className="text-[9px] opacity-80 uppercase tracking-wider font-mono">
+                    Live Provider
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="w-full border-t border-surface-active my-4"></div>
+
+          {/* 2. Simulated Sandbox Testing */}
+          <div className="w-full">
+            <div className="text-[10px] font-normal uppercase tracking-wider text-text-muted mb-3 text-left">
+              Simulated Testing Profiles
+            </div>
+            <div className="flex flex-col gap-2.5 w-full">
+              {mockProfiles.map((profile) => (
+                <button
+                  key={profile.name}
+                  onClick={() => connectWallet(profile.name)}
+                  className="w-full py-4 px-4 bg-surface-active hover:bg-brand hover:text-background text-left text-xs font-light text-text-primary rounded-xl cursor-pointer transition-all duration-200 flex justify-between items-center"
+                >
+                  <span>{profile.name}</span>
+                  <span className="text-[9px] opacity-80 uppercase tracking-wider font-mono">
+                    {profile.role}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
