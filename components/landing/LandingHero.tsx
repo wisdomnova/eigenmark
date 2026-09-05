@@ -26,9 +26,12 @@ export default function LandingHero({ onEnterPortal }: LandingHeroProps) {
     <div className="flex flex-col items-center justify-center text-center px-6 py-20 bg-background min-h-screen">
       {/* Navigation Header */}
       <header className="fixed top-0 left-0 right-0 h-16 bg-surface/80 backdrop-blur-md flex items-center justify-between px-8 z-50">
-        <span className="text-xl font-light tracking-tight text-text-primary">
-          ProofChain
-        </span>
+        <div className="flex items-center gap-3">
+          <img src="/logo.svg" alt="ProofChain Logo" className="w-8 h-8 object-contain" />
+          <span className="text-xl font-light tracking-tight text-text-primary">
+            ProofChain
+          </span>
+        </div>
         <div className="flex items-center gap-4">
           {isConnected ? (
             <div className="flex items-center gap-4">
@@ -66,6 +69,11 @@ export default function LandingHero({ onEnterPortal }: LandingHeroProps) {
 
       {/* Hero Copy */}
       <div className="max-w-5xl mt-16 flex flex-col items-center">
+        {/* Large Brand Emblem */}
+        <div className="w-20 h-20 sm:w-24 sm:h-24 mb-6 flex items-center justify-center">
+          <img src="/logo.svg" alt="ProofChain" className="w-full h-full object-contain" />
+        </div>
+
         <span className="text-xs uppercase tracking-widest text-brand font-normal mb-4">
           verifiable rights layer for digital content
         </span>

@@ -1,11 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
-  <!-- Transparent Background - Minimalist ProofChain Mark -->
-  <!-- Left Interlocking Loop -->
-  <path d="M 32 40 L 44 28 C 50 22 58 22 64 28 L 68 32 C 74 38 74 46 68 52 L 56 64 C 50 70 42 70 36 64" 
-        stroke="#60A5FA" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
-  <!-- Right Interlocking Loop -->
-  <path d="M 68 60 L 56 72 C 50 78 42 78 36 72 L 32 68 C 26 62 26 54 32 48 L 44 36 C 50 30 58 30 64 36" 
-        stroke="#F9FAFB" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
-  <!-- Central Proof Prism Node -->
-  <circle cx="50" cy="50" r="4" fill="#60A5FA" />
+  <!-- Full-bleed high-visibility geometric ProofChain emblem -->
+  <!-- Left Hexagonal / Chain Link -->
+  <path d="M 28 50 L 10 32 C 4 26 4 16 10 10 C 16 4 26 4 32 10 L 58 36 C 64 42 64 52 58 58 L 50 66" 
+        stroke="#60A5FA" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" />
+  
+  <!-- Right Hexagonal / Chain Link -->
+  <path d="M 72 50 L 90 68 C 96 74 96 84 90 90 C 84 96 74 96 68 90 L 42 64 C 36 58 36 48 42 42 L 50 34" 
+        stroke="#F9FAFB" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" />
+  
+  <!-- Central Cryptographic Core Node -->
+  <circle cx="50" cy="50" r="7" fill="#60A5FA" />
 </svg>
