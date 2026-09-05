@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { IconX } from "@tabler/icons-react";
+import { IconX, IconWallet } from "@tabler/icons-react";
 import { useConnect } from "wagmi";
 
 interface WalletModalProps {
@@ -24,6 +24,13 @@ export default function WalletModal({ isOpen, onClose, onConnect }: WalletModalP
       setConnectingWallet(null);
       onClose();
     }
+  };
+
+  const getDisplayName = (connector: any) => {
+    if (connector.name === "Injected") {
+      return "Browser Wallet (Injected)";
+    }
+    return connector.name;
   };
 
   return (
@@ -54,23 +61,34 @@ export default function WalletModal({ isOpen, onClose, onConnect }: WalletModalP
               Connect Web3 Wallet
             </h3>
             <p className="text-xs font-light text-text-muted mb-6 leading-relaxed">
-              Select your wallet provider to authenticate and sign transactions.
+              Detected browser wallets via EIP-6963 multi-provider discovery.
             </p>
 
-            {/* Live Connectors */}
+            {/* Auto-detected Live Connectors */}
             <div className="flex flex-col gap-2">
               {connectors.length === 0 ? (
                 <div className="p-4 bg-surface-active rounded-xl text-xs text-text-muted text-center">
-                  No Ethereum wallet extensions detected. Please install MetaMask, Coinbase Wallet, or Rabby.
+                  No Web3 wallet extensions detected. Please install MetaMask, Coinbase Wallet, or Rabby in your browser.
                 </div>
               ) : (
                 connectors.map((connector) => (
                   <button
                     key={connector.id}
                     onClick={() => handleWalletSelect(connector)}
-                    className="w-full py-3.5 px-4 bg-surface-active hover:bg-brand hover:text-background text-left text-xs font-light text-text-primary rounded-xl cursor-pointer transition-all duration-200 flex justify-between items-center"
+                    className="w-full py-3.5 px-4 bg-surface-active hover:bg-brand hover:text-background text-left text-xs font-light text-text-primary rounded-xl cursor-pointer transition-all duration-200 flex justify-between items-center group"
                   >
-                    <span>{connector.name}</span>
+                    <div className="flex items-center gap-3">
+                      {connector.icon ? (
+                        <img
+                          src={connector.icon}
+                          alt={connector.name}
+                          className="w-5 h-5 rounded-md object-contain"
+                        />
+                      ) : (
+                        <IconWallet size={18} className="text-brand group-hover:text-background" />
+                      )}
+                      <span>{getDisplayName(connector)}</span>
+                    </div>
                     <span className="text-[9px] opacity-80 uppercase tracking-wider font-mono">
                       Connect
                     </span>

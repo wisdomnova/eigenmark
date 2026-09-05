@@ -3,13 +3,20 @@
 import { useAppState } from "@/context/StateContext";
 import Sidebar from "@/components/dashboard/Sidebar";
 import React from "react";
-import { IconLock, IconMenu2 } from "@tabler/icons-react";
+import { IconLock, IconMenu2, IconWallet } from "@tabler/icons-react";
 import { useConnect } from "wagmi";
 
 function PortalContent({ children }: { children: React.ReactNode }) {
   const { isConnected, connectWallet } = useAppState();
   const { connectors } = useConnect();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+
+  const getDisplayName = (connector: any) => {
+    if (connector.name === "Injected") {
+      return "Browser Wallet (Injected)";
+    }
+    return connector.name;
+  };
 
   if (!isConnected) {
     return (
@@ -27,10 +34,10 @@ function PortalContent({ children }: { children: React.ReactNode }) {
             Please connect your Web3 wallet to authorize access to the creative registry and smart contract logs.
           </p>
 
-          {/* Live Wallet Connections */}
+          {/* Auto-detected Live Wallet Connections */}
           <div className="w-full">
             <div className="text-[10px] font-normal uppercase tracking-wider text-text-muted mb-3 text-left">
-              Select Wallet Provider
+              Detected Wallets
             </div>
             <div className="flex flex-col gap-2.5 w-full">
               {connectors.length === 0 ? (
@@ -42,9 +49,20 @@ function PortalContent({ children }: { children: React.ReactNode }) {
                   <button
                     key={connector.id}
                     onClick={() => connectWallet(connector)}
-                    className="w-full py-4 px-4 bg-surface-active hover:bg-brand hover:text-background text-left text-xs font-light text-text-primary rounded-xl cursor-pointer transition-all duration-200 flex justify-between items-center"
+                    className="w-full py-4 px-4 bg-surface-active hover:bg-brand hover:text-background text-left text-xs font-light text-text-primary rounded-xl cursor-pointer transition-all duration-200 flex justify-between items-center group"
                   >
-                    <span>{connector.name}</span>
+                    <div className="flex items-center gap-3">
+                      {connector.icon ? (
+                        <img
+                          src={connector.icon}
+                          alt={connector.name}
+                          className="w-5 h-5 rounded-md object-contain"
+                        />
+                      ) : (
+                        <IconWallet size={18} className="text-brand group-hover:text-background" />
+                      )}
+                      <span>{getDisplayName(connector)}</span>
+                    </div>
                     <span className="text-[9px] opacity-80 uppercase tracking-wider font-mono">
                       Connect
                     </span>
