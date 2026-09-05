@@ -11,6 +11,7 @@ interface Asset {
   royaltySplit: number;
   creatorAddress: string;
   parentId?: string;
+  phash?: string;
   mediaUrl?: string;
   timestamp: string;
   transactionHash: string;
@@ -20,10 +21,112 @@ interface VerifyPanelProps {
   assets: Array<Asset>;
 }
 
+async function computeSha256(file: File): Promise<string> {
+  const arrayBuffer = await file.arrayBuffer();
+  const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+  return "0x" + hashHex;
+}
+
+async function computePHash(file: File): Promise<string> {
+  return new Promise((resolve) => {
+    if (!file.type.startsWith("image/")) {
+      resolve("0000000000000000");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = 32;
+        canvas.height = 32;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          resolve("0000000000000000");
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, 32, 32);
+        const imgData = ctx.getImageData(0, 0, 32, 32);
+        const data = imgData.data;
+
+        // Grayscale conversion
+        const gray = new Float32Array(32 * 32);
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          gray[i / 4] = 0.299 * r + 0.587 * g + 0.114 * b;
+        }
+
+        // Discrete Cosine Transform (DCT-II) - Top-left 8x8 grid
+        const dct = new Float32Array(8 * 8);
+        for (let u = 0; u < 8; u++) {
+          for (let v = 0; v < 8; v++) {
+            let sum = 0;
+            for (let x = 0; x < 32; x++) {
+              for (let y = 0; y < 32; y++) {
+                sum += gray[x * 32 + y] *
+                       Math.cos(((2 * x + 1) * u * Math.PI) / 64) *
+                       Math.cos(((2 * y + 1) * v * Math.PI) / 64);
+              }
+            }
+            let cu = u === 0 ? 1 / Math.sqrt(2) : 1;
+            let cv = v === 0 ? 1 / Math.sqrt(2) : 1;
+            dct[u * 8 + v] = 0.25 * cu * cv * sum;
+          }
+        }
+
+        let sumCoeffs = 0;
+        for (let i = 1; i < 64; i++) {
+          sumCoeffs += dct[i];
+        }
+        const mean = sumCoeffs / 63;
+
+        let hexHash = "";
+        let currentByte = 0;
+        for (let i = 0; i < 64; i++) {
+          const bit = dct[i] > mean ? 1 : 0;
+          currentByte = (currentByte << 1) | bit;
+          
+          if ((i + 1) % 8 === 0) {
+            hexHash += currentByte.toString(16).padStart(2, "0");
+            currentByte = 0;
+          }
+        }
+
+        resolve(hexHash);
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function hammingDistance(h1: string, h2: string): number {
+  if (!h1 || !h2 || h1.length !== 16 || h2.length !== 16) return 64;
+  let dist = 0;
+  for (let i = 0; i < 16; i++) {
+    const v1 = parseInt(h1[i], 16);
+    const v2 = parseInt(h2[i], 16);
+    let xor = v1 ^ v2;
+    while (xor > 0) {
+      dist += xor & 1;
+      xor >>= 1;
+    }
+  }
+  return dist;
+}
+
 export default function VerifyPanel({ assets }: VerifyPanelProps) {
   const [dragActive, setDragActive] = useState(false);
   const [isHashing, setIsHashing] = useState(false);
   const [verifiedAsset, setVerifiedAsset] = useState<Asset | null>(null);
+  const [matchType, setMatchType] = useState<"exact" | "perceptual" | null>(null);
+  const [computedHashes, setComputedHashes] = useState<{ sha256: string; phash: string } | null>(null);
   const [searched, setSearched] = useState(false);
   const [fileName, setFileName] = useState("");
 
@@ -37,61 +140,79 @@ export default function VerifyPanel({ assets }: VerifyPanelProps) {
     }
   };
 
-  const lookupHash = (fileHash: string) => {
+  const processFileVerification = async (file: File) => {
+    setFileName(file.name);
     setIsHashing(true);
-    setTimeout(() => {
-      // Find exact or partial match for demo purposes
-      // Let's match by checking if the hash exists in our list
-      const matched = assets.find(
-        (a) => a.contentHash.toLowerCase() === fileHash.toLowerCase()
+    setSearched(false);
+    setVerifiedAsset(null);
+    setMatchType(null);
+
+    try {
+      const sha256 = await computeSha256(file);
+      const phash = await computePHash(file);
+      setComputedHashes({ sha256, phash });
+
+      // 1. Check exact SHA-256 match
+      const exactMatch = assets.find(
+        (a) => a.contentHash.toLowerCase() === sha256.toLowerCase()
       );
-      setVerifiedAsset(matched || null);
+
+      if (exactMatch) {
+        setVerifiedAsset(exactMatch);
+        setMatchType("exact");
+      } else {
+        // 2. Check perceptual similarity match
+        let bestMatch: Asset | null = null;
+        let minDistance = 11; // Threshold
+
+        for (const asset of assets) {
+          if (asset.phash) {
+            const dist = hammingDistance(phash, asset.phash);
+            if (dist < minDistance) {
+              minDistance = dist;
+              bestMatch = asset;
+            }
+          }
+        }
+
+        if (bestMatch) {
+          setVerifiedAsset(bestMatch);
+          setMatchType("perceptual");
+        } else {
+          setVerifiedAsset(null);
+        }
+      }
+    } catch (err) {
+      console.error("Verification hash computation failed:", err);
+      setVerifiedAsset(null);
+    } finally {
       setSearched(true);
       setIsHashing(false);
-    }, 800);
+    }
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0];
-      setFileName(file.name);
-      // For demo, if we drag a file that is similar to one of our existing assets, we match it!
-      // Let's find if an asset matches the file name, else generate a random hash that won't match
-      const matchedByName = assets.find(
-        (a) => a.title.toLowerCase() === file.name.split(".")[0].toLowerCase()
-      );
-      if (matchedByName) {
-        lookupHash(matchedByName.contentHash);
-      } else {
-        // Generate random hash representing unmatched file
-        lookupHash("0x" + Math.random().toString(36).substring(2, 15) + "unmatched");
-      }
+      await processFileVerification(e.dataTransfer.files[0]);
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setFileName(file.name);
-      const matchedByName = assets.find(
-        (a) => a.title.toLowerCase() === file.name.split(".")[0].toLowerCase()
-      );
-      if (matchedByName) {
-        lookupHash(matchedByName.contentHash);
-      } else {
-        lookupHash("0x" + Math.random().toString(36).substring(2, 15) + "unmatched");
-      }
+      await processFileVerification(e.target.files[0]);
     }
   };
 
-  // Helper to select an existing asset directly to test verification
-  const handleVerifyDemoAsset = (asset: Asset) => {
+  const handleSelectAsset = (asset: Asset) => {
     setFileName(asset.title);
-    lookupHash(asset.contentHash);
+    setComputedHashes({ sha256: asset.contentHash, phash: asset.phash || "N/A" });
+    setVerifiedAsset(asset);
+    setMatchType("exact");
+    setSearched(true);
   };
 
   return (
@@ -104,7 +225,7 @@ export default function VerifyPanel({ assets }: VerifyPanelProps) {
           Verify creative provenance
         </h2>
         <p className="text-xs font-light text-text-muted mt-1 leading-relaxed">
-          Drop any media file to search the blockchain index. ProofChain queries the hash and resolves the entire registered history.
+          Drop any media file to compute client side cryptographic and perceptual signatures. ProofChain searches the database and smart contract ledger in real time.
         </p>
       </div>
 
@@ -128,7 +249,7 @@ export default function VerifyPanel({ assets }: VerifyPanelProps) {
           {isHashing ? (
             <div className="flex flex-col items-center gap-2">
               <div className="w-6 h-6 border-2 border-brand border-t-transparent animate-spin rounded-full"></div>
-              <span className="text-xs font-light text-text-muted">Analyzing file signature</span>
+              <span className="text-xs font-light text-text-muted">Computing SHA 256 and pHash</span>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-2">
@@ -159,7 +280,7 @@ export default function VerifyPanel({ assets }: VerifyPanelProps) {
             {verifiedAsset ? (
               <div className="bg-surface-active/50 p-6 rounded-2xl flex flex-col gap-4">
                 {verifiedAsset.mediaUrl && (
-                  <div className="w-full h-44 overflow-hidden rounded-2xl bg-background border border-surface-active/50 flex items-center justify-center">
+                  <div className="w-full h-44 overflow-hidden rounded-2xl bg-background flex items-center justify-center">
                     <img 
                       src={verifiedAsset.mediaUrl} 
                       alt={verifiedAsset.title} 
@@ -170,14 +291,14 @@ export default function VerifyPanel({ assets }: VerifyPanelProps) {
                 <div className="flex justify-between items-start">
                   <div>
                     <span className="text-[10px] uppercase tracking-widest text-success font-normal block mb-1">
-                      Provenance verified
+                      {matchType === "exact" ? "Cryptographic match verified" : "Perceptual visual match detected"}
                     </span>
                     <h3 className="text-xl font-light text-text-primary">
                       {verifiedAsset.title}
                     </h3>
                   </div>
                   <span className="bg-success/10 text-success text-[10px] uppercase font-mono px-3 py-1 rounded-full">
-                    Active on ledger
+                    Ledger Confirmed
                   </span>
                 </div>
 
@@ -248,33 +369,37 @@ export default function VerifyPanel({ assets }: VerifyPanelProps) {
                   No provenance record found
                 </h3>
                 <p className="text-xs font-light text-text-muted max-w-md mx-auto leading-relaxed">
-                  This file hash does not match any registered asset signature. It may be unregistered or altered.
+                  This file signature does not match any registered asset in the database.
                 </p>
-                <p className="text-[10px] font-mono text-text-muted mt-3">
-                  Signature query: {fileName}
-                </p>
+                {computedHashes && (
+                  <div className="text-[10px] font-mono text-text-muted mt-3 truncate">
+                    SHA 256: {computedHashes.sha256} | pHash: {computedHashes.phash}
+                  </div>
+                )}
               </div>
             )}
           </div>
         )}
 
-        {/* Demo Shortcut Quick Links */}
-        <div className="text-left mt-4">
-          <span className="text-[10px] uppercase tracking-wider text-text-muted block mb-3">
-            Quick verify registered assets
-          </span>
-          <div className="flex flex-wrap gap-2">
-            {assets.map((asset) => (
-              <button
-                key={asset.id}
-                onClick={() => handleVerifyDemoAsset(asset)}
-                className="px-3 py-1.5 bg-surface-active hover:bg-brand hover:text-background text-xs font-light rounded-full text-text-primary transition-colors duration-200 cursor-pointer"
-              >
-                {asset.title}
-              </button>
-            ))}
+        {/* Registered Ledger Assets Quick Inspector */}
+        {assets.length > 0 && (
+          <div className="text-left mt-4">
+            <span className="text-[10px] uppercase tracking-wider text-text-muted block mb-3">
+              Inspect registered ledger assets
+            </span>
+            <div className="flex flex-wrap gap-2">
+              {assets.map((asset) => (
+                <button
+                  key={asset.id}
+                  onClick={() => handleSelectAsset(asset)}
+                  className="px-3 py-1.5 bg-surface-active hover:bg-brand hover:text-background text-xs font-light rounded-full text-text-primary transition-colors duration-200 cursor-pointer"
+                >
+                  {asset.title}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

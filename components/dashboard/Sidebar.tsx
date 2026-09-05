@@ -12,6 +12,8 @@ import {
   IconReceipt,
   IconArrowLeft,
   IconX,
+  IconCopy,
+  IconCheck,
 } from "@tabler/icons-react";
 
 interface SidebarProps {
@@ -22,8 +24,9 @@ interface SidebarProps {
 export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { users, currentUser, setCurrentUser, disconnectWallet } = useAppState();
+  const { currentUser, disconnectWallet } = useAppState();
 
+  const [copied, setCopied] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
@@ -36,6 +39,15 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleCopyAddress = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (currentUser.address) {
+      navigator.clipboard.writeText(currentUser.address);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   const menuItems = [
     { href: "/portal/register", label: "Register Work", icon: IconPlus },
@@ -111,15 +123,15 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
           <span>Exit Portal</span>
         </button>
 
-        {/* Brooklyn-style Profile Card */}
+        {/* Active Connected User Profile Card */}
         <div className="bg-surface-active/30 p-3 rounded-2xl flex flex-col gap-3 relative" ref={userMenuRef}>
           <div 
             onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
             className="flex items-center gap-3 cursor-pointer hover:bg-surface-active/40 p-1.5 rounded-xl transition-colors duration-150"
           >
-            {/* Avatar placeholder circle */}
-            <div className="w-8 h-8 rounded-full bg-brand text-background flex items-center justify-center font-normal text-sm uppercase">
-              {currentUser.name.substring(0, 1)}
+            {/* Avatar circle */}
+            <div className="w-8 h-8 rounded-full bg-brand text-background flex items-center justify-center font-normal text-xs uppercase">
+              {currentUser.address.substring(2, 4)}
             </div>
             <div className="text-left flex-1 min-w-0">
               <span className="text-xs font-normal text-text-primary block leading-none truncate">
@@ -133,26 +145,18 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
 
           {isUserMenuOpen && (
             <div className="absolute bottom-full left-0 right-0 mb-2 bg-surface-active rounded-xl py-2 z-50">
-              {users.map((user) => (
-                <button
-                  key={user.name}
-                  type="button"
-                  onClick={() => {
-                    setCurrentUser(user);
-                    setIsUserMenuOpen(false);
-                  }}
-                  className={`w-full px-3 py-2 text-left text-[10px] font-light tracking-wide transition-colors duration-150 cursor-pointer flex flex-col gap-0.5 ${
-                    user.name === currentUser.name
-                      ? "bg-brand text-background"
-                      : "text-text-primary hover:bg-surface/70"
-                  }`}
-                >
-                  <span>{user.name}</span>
-                  <span className={`text-[8px] font-mono ${user.name === currentUser.name ? "text-background/80" : "text-text-muted"}`}>
-                    {user.role} ({user.address.substring(0, 6)}...)
-                  </span>
-                </button>
-              ))}
+              <div className="px-3 py-2 text-[10px] text-text-muted">
+                <span className="block uppercase text-[8px] tracking-wider text-brand">Role</span>
+                <span className="text-text-primary font-normal">{currentUser.role}</span>
+              </div>
+              <button
+                type="button"
+                onClick={handleCopyAddress}
+                className="w-full px-3 py-2 text-left text-[10px] font-light text-text-primary hover:bg-surface/70 transition-colors duration-150 cursor-pointer flex items-center justify-between"
+              >
+                <span>Copy Full Address</span>
+                {copied ? <IconCheck size={12} className="text-success" /> : <IconCopy size={12} />}
+              </button>
               <div className="border-t border-surface my-1.5"></div>
               <button
                 type="button"

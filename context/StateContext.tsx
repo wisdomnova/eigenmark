@@ -69,53 +69,23 @@ interface StateContextType {
 const StateContext = createContext<StateContextType | undefined>(undefined);
 const queryClient = new QueryClient();
 
+const defaultUser: User = {
+  name: "Operator",
+  address: "0x0000000000000000000000000000000000000000",
+  role: "Content Creator",
+};
+
 function StateProviderContent({ children }: { children: ReactNode }) {
-  const users: Array<User> = [
-    { name: "Alice", address: "0x1111111111111111111111111111111111111111", role: "Creator" },
-    { name: "Bob", address: "0x2222222222222222222222222222222222222222", role: "Remixer" },
-    { name: "Charlie", address: "0x3333333333333333333333333333333333333333", role: "Buyer" },
-  ];
-
-  const [currentUserMock, setCurrentUserMock] = useState<User>(users[0]);
-  const [isConnectedMock, setIsConnectedMock] = useState(false);
-
   // Wagmi hooks for real Web3 interaction
   const { address: walletAddress, isConnected: isWalletConnected } = useAccount();
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
   const { writeContractAsync } = useWriteContract();
 
-  const isConnected = isWalletConnected || isConnectedMock;
-  const [currentUser, setCurrentUser] = useState<User>(users[0]);
-
-  const [assets, setAssets] = useState<Array<Asset>>([
-    {
-      id: "1",
-      title: "Alice Original Asset",
-      description: "An abstract mathematical fractal design visualizing chaos theory.",
-      aiModel: "Stable Diffusion 3",
-      contentHash: "0xab12c345de6789f01234567890abcdef1234567890abcdef1234567890ab1234",
-      royaltySplit: 10,
-      creatorAddress: "0x1111111111111111111111111111111111111111",
-      phash: "0f0f0f0f0f0f0f0f",
-      timestamp: "22 Aug 2026 18:12",
-      transactionHash: "0x892a3bc90de12c43abef9023ab90d34e902bc345d90e20c90f23a91bc90d1f43",
-    },
-    {
-      id: "2",
-      title: "Bob Remix Asset",
-      description: "A fluid remix of mathematical fractals combining animation frames.",
-      aiModel: "Midjourney v6",
-      contentHash: "0xcd34e567f01234567890abcdef1234567890abcdef1234567890abcdef1234cd",
-      royaltySplit: 10,
-      creatorAddress: "0x2222222222222222222222222222222222222222",
-      parentId: "1",
-      phash: "0f0f0f0f0f0f0f00",
-      timestamp: "23 Aug 2026 09:30",
-      transactionHash: "0x91bc83af10df20c908f23a91bc90d1f43a91bc90de12c43abef9023ab90d34e90",
-    },
-  ]);
-
+  const isConnected = isWalletConnected;
+  const [currentUser, setCurrentUser] = useState<User>(defaultUser);
+  const [users, setUsers] = useState<Array<User>>([]);
+  const [assets, setAssets] = useState<Array<Asset>>([]);
   const [agreements, setAgreements] = useState<Array<LicensingAgreement>>([]);
 
   // Database synchronization: load initial records on mount
@@ -149,7 +119,7 @@ function StateProviderContent({ children }: { children: ReactNode }) {
     loadInitialData();
   }, []);
 
-  // Database synchronization: register connected wallet profile or handle mocks
+  // Database synchronization: register connected wallet profile
   useEffect(() => {
     async function registerOrCheckUser() {
       if (isWalletConnected && walletAddress) {
@@ -161,74 +131,68 @@ function StateProviderContent({ children }: { children: ReactNode }) {
             },
             body: JSON.stringify({
               walletAddress: walletAddress,
-              name: "Web3 User",
-              role: "Active Operator",
+              name: `Wallet ${walletAddress.substring(0, 6)}...${walletAddress.slice(-4)}`,
+              role: "Creator & Operator",
             }),
           });
 
           if (response.ok) {
             const dbUser = await response.json();
-            setCurrentUser({
+            const activeUser: User = {
               name: dbUser.name,
               address: dbUser.wallet_address,
               role: dbUser.role,
-            });
+            };
+            setCurrentUser(activeUser);
+            setUsers([activeUser]);
           } else {
-            setCurrentUser({
-              name: "Web3 User",
+            const activeUser: User = {
+              name: `Wallet ${walletAddress.substring(0, 6)}...${walletAddress.slice(-4)}`,
               address: walletAddress,
-              role: "Active Operator",
-            });
+              role: "Creator & Operator",
+            };
+            setCurrentUser(activeUser);
+            setUsers([activeUser]);
           }
         } catch (err) {
           console.error("User registration check failed:", err);
-          setCurrentUser({
-            name: "Web3 User",
+          const activeUser: User = {
+            name: `Wallet ${walletAddress.substring(0, 6)}...${walletAddress.slice(-4)}`,
             address: walletAddress,
-            role: "Active Operator",
-          });
+            role: "Creator & Operator",
+          };
+          setCurrentUser(activeUser);
+          setUsers([activeUser]);
         }
       } else {
-        // Fallback to mock user profile
-        setCurrentUser(currentUserMock);
+        setCurrentUser(defaultUser);
+        setUsers([]);
       }
     }
     registerOrCheckUser();
-  }, [walletAddress, isWalletConnected, currentUserMock]);
+  }, [walletAddress, isWalletConnected]);
 
   const connectWallet = (connectorOrName: any) => {
-    // If it's a connector object (passed from portal list), connect it directly
     if (connectorOrName && typeof connectorOrName === "object" && connectorOrName.connect) {
       connect({ connector: connectorOrName });
       return;
     }
 
     const walletName = String(connectorOrName);
-    // Find connector by name (case-insensitive)
     const targetConnector = connectors.find(
       (c) => c.name.toLowerCase() === walletName.toLowerCase() || c.id.toLowerCase() === walletName.toLowerCase()
     );
 
     if (targetConnector) {
       connect({ connector: targetConnector });
-    } else {
-      // Fallback: connect mock user for demonstration
-      setIsConnectedMock(true);
-      if (walletName === "MetaMask") {
-        setCurrentUserMock(users[0]); // Alice
-      } else if (walletName === "Coinbase Wallet") {
-        setCurrentUserMock(users[1]); // Bob
-      } else if (walletName === "WalletConnect") {
-        setCurrentUserMock(users[2]); // Charlie
-      }
+    } else if (connectors.length > 0) {
+      connect({ connector: connectors[0] });
     }
   };
 
   const disconnectWallet = () => {
-    if (isWalletConnected) {
-      disconnect();
-    }
-    setIsConnectedMock(false);
+    disconnect();
+    setCurrentUser(defaultUser);
   };
 
   const registerAsset = async (newAsset: {
@@ -242,7 +206,7 @@ function StateProviderContent({ children }: { children: ReactNode }) {
     phash?: string;
     mediaUrl?: string;
   }) => {
-    let txHash = "0x" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    let txHash = "0x" + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
 
     if (isWalletConnected) {
       try {
@@ -253,14 +217,14 @@ function StateProviderContent({ children }: { children: ReactNode }) {
           args: [
             newAsset.contentHash,
             newAsset.title,
-            BigInt(newAsset.royaltySplit),
+            BigInt(Math.round(newAsset.royaltySplit * 100)),
             newAsset.parentId || "",
-            "0xlicensetermshashplaceholder"
+            "0xlicensetermshashplaceholder",
           ],
         });
         if (hash) txHash = hash;
       } catch (err) {
-        console.error("Contract transaction failed, using mock transaction hash", err);
+        console.error("Contract transaction failed:", err);
       }
     }
 
@@ -298,14 +262,17 @@ function StateProviderContent({ children }: { children: ReactNode }) {
     const formattedAsset: Asset = {
       ...newAsset,
       id: nextId,
-      timestamp: new Date().toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }) + " " + new Date().toLocaleTimeString("en-GB", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
+      timestamp:
+        new Date().toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }) +
+        " " +
+        new Date().toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
       transactionHash: txHash,
     };
 
@@ -319,7 +286,7 @@ function StateProviderContent({ children }: { children: ReactNode }) {
     price: number;
     royaltySplit: number;
   }) => {
-    let txHash = "0x" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    let txHash = "0x" + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
 
     const asset = assets.find((a) => a.id === agreement.assetId);
 
@@ -334,7 +301,7 @@ function StateProviderContent({ children }: { children: ReactNode }) {
         });
         if (hash) txHash = hash;
       } catch (err) {
-        console.error("Contract transaction failed, using mock transaction hash", err);
+        console.error("Contract transaction failed:", err);
       }
     }
 
@@ -371,14 +338,17 @@ function StateProviderContent({ children }: { children: ReactNode }) {
       ...agreement,
       id: String(agreements.length + 1),
       transactionHash: txHash,
-      timestamp: new Date().toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }) + " " + new Date().toLocaleTimeString("en-GB", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
+      timestamp:
+        new Date().toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }) +
+        " " +
+        new Date().toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
     };
 
     setAgreements((prev) => [...prev, newAgreement]);
@@ -389,7 +359,7 @@ function StateProviderContent({ children }: { children: ReactNode }) {
       value={{
         users,
         currentUser,
-        setCurrentUser: setCurrentUserMock,
+        setCurrentUser,
         assets,
         agreements,
         isConnected,

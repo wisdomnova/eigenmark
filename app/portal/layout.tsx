@@ -11,12 +11,6 @@ function PortalContent({ children }: { children: React.ReactNode }) {
   const { connectors } = useConnect();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
-  const mockProfiles = [
-    { name: "MetaMask", role: "Alice (Creator Profile)" },
-    { name: "Coinbase Wallet", role: "Bob (Remixer Profile)" },
-    { name: "WalletConnect", role: "Charlie (Buyer Profile)" },
-  ];
-
   if (!isConnected) {
     return (
       <div className="min-h-screen w-full bg-background flex flex-col items-center justify-center p-6 text-center select-none font-sans">
@@ -30,51 +24,33 @@ function PortalContent({ children }: { children: React.ReactNode }) {
             Access Restricted
           </h3>
           <p className="text-xs font-light text-text-muted mb-8 leading-relaxed max-w-xs">
-            Please connect your Web3 wallet to authorize secure access to the creative registry and contract logs.
+            Please connect your Web3 wallet to authorize access to the creative registry and smart contract logs.
           </p>
 
-          {/* 1. Live Wallet Connections */}
-          <div className="w-full mb-6">
-            <div className="text-[10px] font-normal uppercase tracking-wider text-text-muted mb-3 text-left">
-              Live Wallet Connection
-            </div>
-            <div className="flex flex-col gap-2 w-full">
-              {connectors.map((connector) => (
-                <button
-                  key={connector.id}
-                  onClick={() => connectWallet(connector)}
-                  className="w-full py-4 px-4 bg-surface-active hover:bg-brand hover:text-background text-left text-xs font-light text-text-primary rounded-xl cursor-pointer transition-all duration-200 flex justify-between items-center"
-                >
-                  <span>{connector.name}</span>
-                  <span className="text-[9px] opacity-80 uppercase tracking-wider font-mono">
-                    Live Provider
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Divider */}
-          <div className="w-full border-t border-surface-active my-4"></div>
-
-          {/* 2. Simulated Sandbox Testing */}
+          {/* Live Wallet Connections */}
           <div className="w-full">
             <div className="text-[10px] font-normal uppercase tracking-wider text-text-muted mb-3 text-left">
-              Simulated Testing Profiles
+              Select Wallet Provider
             </div>
             <div className="flex flex-col gap-2.5 w-full">
-              {mockProfiles.map((profile) => (
-                <button
-                  key={profile.name}
-                  onClick={() => connectWallet(profile.name)}
-                  className="w-full py-4 px-4 bg-surface-active hover:bg-brand hover:text-background text-left text-xs font-light text-text-primary rounded-xl cursor-pointer transition-all duration-200 flex justify-between items-center"
-                >
-                  <span>{profile.name}</span>
-                  <span className="text-[9px] opacity-80 uppercase tracking-wider font-mono">
-                    {profile.role}
-                  </span>
-                </button>
-              ))}
+              {connectors.length === 0 ? (
+                <div className="p-4 bg-surface-active rounded-xl text-xs text-text-muted text-center">
+                  No Web3 wallet extension detected. Please install MetaMask, Coinbase Wallet, or Rabby.
+                </div>
+              ) : (
+                connectors.map((connector) => (
+                  <button
+                    key={connector.id}
+                    onClick={() => connectWallet(connector)}
+                    className="w-full py-4 px-4 bg-surface-active hover:bg-brand hover:text-background text-left text-xs font-light text-text-primary rounded-xl cursor-pointer transition-all duration-200 flex justify-between items-center"
+                  >
+                    <span>{connector.name}</span>
+                    <span className="text-[9px] opacity-80 uppercase tracking-wider font-mono">
+                      Connect
+                    </span>
+                  </button>
+                ))
+              )}
             </div>
           </div>
         </div>

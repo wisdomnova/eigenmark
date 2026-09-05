@@ -90,9 +90,10 @@ export default function LicensingConsole({
 
   const getParentCreatorName = (assetId: string) => {
     const asset = assets.find((a) => a.id === assetId);
-    if (!asset || !asset.parentId) return "Unknown";
-    const parent = assets.find((p) => p.id === asset.parentId);
-    return parent ? (parent.creatorAddress.substring(0, 6) === "0x1111" ? "Alice" : "Creator") : "Original";
+    if (!asset || !asset.parentId) return "Original";
+    const parent = assets.find((p) => p.id === asset.parentId || p.contentHash === asset.parentId);
+    if (!parent) return "Parent Asset";
+    return `${parent.creatorAddress.substring(0, 6)}...${parent.creatorAddress.slice(-4)}`;
   };
 
   const derivativeOptions = derivatives.map((asset) => ({
