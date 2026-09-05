@@ -20,6 +20,13 @@ export const metadata: Metadata = {
     title: "ProofChain Creative Provenance Registry",
     description: "Secure decentralized provenance and automated royalty splits for creative assets",
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/logo.svg", type: "image/svg+xml" },
+    ],
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

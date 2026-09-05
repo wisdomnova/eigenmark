@@ -66,9 +66,10 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
           <Link
             href="/"
             onClick={onClose}
-            className="text-lg font-light tracking-tight text-text-primary hover:text-brand transition-colors duration-200 cursor-pointer block"
+            className="flex items-center gap-2.5 text-lg font-light tracking-tight text-text-primary hover:text-brand transition-colors duration-200 cursor-pointer"
           >
-            ProofChain
+            <img src="/logo.svg" alt="ProofChain Logo" className="w-5 h-5 rounded-md" />
+            <span>ProofChain</span>
           </Link>
           <button
             onClick={onClose}

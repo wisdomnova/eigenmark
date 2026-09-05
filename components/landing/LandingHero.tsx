@@ -26,9 +26,12 @@ export default function LandingHero({ onEnterPortal }: LandingHeroProps) {
     <div className="flex flex-col items-center justify-center text-center px-6 py-20 bg-background min-h-screen">
       {/* Navigation Header */}
       <header className="fixed top-0 left-0 right-0 h-16 bg-surface/80 backdrop-blur-md flex items-center justify-between px-8 z-50">
-        <span className="text-xl font-light tracking-tight text-text-primary">
-          ProofChain
-        </span>
+        <div className="flex items-center gap-2.5">
+          <img src="/logo.svg" alt="ProofChain Logo" className="w-6 h-6 rounded-lg" />
+          <span className="text-xl font-light tracking-tight text-text-primary">
+            ProofChain
+          </span>
+        </div>
         <div className="flex items-center gap-4">
           {isConnected ? (
             <div className="flex items-center gap-4">
