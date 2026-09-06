@@ -1,202 +1,190 @@
 import { ImageResponse } from "next/og";
 
-export const runtime = "nodejs";
-
-export const alt = "ProofChain Creative Provenance Registry";
+export const runtime = "edge";
+export const alt = "ProofChain - Creative Provenance Registry";
 export const size = {
   width: 1200,
   height: 630,
 };
-
 export const contentType = "image/png";
 
 export default async function Image() {
-  // Fetch Google Sans Flex font from the Google Fonts API dynamically
-  let fontData: ArrayBuffer | null = null;
-  try {
-    const cssResponse = await fetch(
-      "https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;700&display=swap",
-      {
-        headers: {
-          // Requesting ttf format specifically by mimicking an older Android device
-          "User-Agent":
-            "Mozilla/5.0 (Linux; U; Android 2.2) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1",
-        },
-      }
-    );
-    const css = await cssResponse.text();
-    const match = css.match(/src:\s*url\(([^)]+)\)/);
-    if (match && match[1]) {
-      const fontResponse = await fetch(match[1]);
-      fontData = await fontResponse.arrayBuffer();
-    }
-  } catch (error) {
-    console.error("Failed to load Google Sans Flex for OG image, falling back:", error);
-  }
-
   return new ImageResponse(
     (
       <div
         style={{
-          background: "#0A0B0D",
           width: "100%",
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
           justifyContent: "space-between",
-          fontFamily: fontData ? "Google Sans Flex" : "sans-serif",
+          padding: "70px 80px",
+          backgroundColor: "#0A0B0D",
           color: "#F9FAFB",
-          padding: "80px",
-          boxSizing: "border-box",
+          fontFamily: "sans-serif",
+          position: "relative",
         }}
       >
-        {/* Top Header */}
+        {/* Top Brand Header */}
         <div
           style={{
             display: "flex",
+            alignItems: "center",
             justifyContent: "space-between",
             width: "100%",
-            alignItems: "center",
           }}
         >
-          <span
-            style={{
-              fontSize: "32px",
-              fontWeight: 300,
-              letterSpacing: "-0.03em",
-              color: "#F9FAFB",
-            }}
-          >
-            ProofChain
-          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            <svg width="40" height="40" viewBox="0 0 100 100" fill="none">
+              <path
+                d="M 28 50 L 10 32 C 4 26 4 16 10 10 C 16 4 26 4 32 10 L 58 36 C 64 42 64 52 58 58 L 50 66"
+                stroke="#60A5FA"
+                strokeWidth="12"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M 72 50 L 90 68 C 96 74 96 84 90 90 C 84 96 74 96 68 90 L 42 64 C 36 58 36 48 42 42 L 50 34"
+                stroke="#F9FAFB"
+                strokeWidth="12"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle cx="50" cy="50" r="8" fill="#60A5FA" />
+            </svg>
+            <span
+              style={{
+                fontSize: "26px",
+                fontWeight: 300,
+                letterSpacing: "-0.5px",
+                color: "#F9FAFB",
+              }}
+            >
+              ProofChain
+            </span>
+          </div>
+
           <div
             style={{
-              background: "#14161A",
-              borderRadius: "12px",
-              padding: "8px 16px",
-              fontSize: "14px",
-              fontWeight: 400,
+              display: "flex",
+              alignItems: "center",
+              padding: "6px 18px",
+              borderRadius: "9999px",
+              backgroundColor: "#14161A",
               color: "#60A5FA",
-              letterSpacing: "0.05em",
+              fontSize: "12px",
+              letterSpacing: "0.5px",
+              textTransform: "uppercase",
             }}
           >
-            ARBITRUM TESTNET
+            Arbitrum Active
           </div>
         </div>
 
-        {/* Center Content */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            textAlign: "center",
-            maxWidth: "800px",
-            marginTop: "20px",
-          }}
-        >
-          <h1
+        {/* Center Content Section */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          {/* Feature Badges */}
+          <div style={{ display: "flex", gap: "12px" }}>
+            <div
+              style={{
+                padding: "6px 16px",
+                borderRadius: "9999px",
+                backgroundColor: "#14161A",
+                color: "#9CA3AF",
+                fontSize: "13px",
+              }}
+            >
+              01 Perceptual pHash
+            </div>
+            <div
+              style={{
+                padding: "6px 16px",
+                borderRadius: "9999px",
+                backgroundColor: "#14161A",
+                color: "#9CA3AF",
+                fontSize: "13px",
+              }}
+            >
+              02 On Chain Splits
+            </div>
+            <div
+              style={{
+                padding: "6px 16px",
+                borderRadius: "9999px",
+                backgroundColor: "#14161A",
+                color: "#9CA3AF",
+                fontSize: "13px",
+              }}
+            >
+              03 Model Context Protocol
+            </div>
+          </div>
+
+          {/* Large Headline */}
+          <div
             style={{
-              fontSize: "64px",
-              fontWeight: 700,
-              letterSpacing: "-0.04em",
+              fontSize: "58px",
+              fontWeight: 300,
               lineHeight: 1.1,
-              margin: 0,
+              letterSpacing: "-1.5px",
               color: "#F9FAFB",
+              display: "flex",
+              flexDirection: "column",
             }}
           >
-            Creative Provenance Registry
-          </h1>
-          <p
+            <span>The machine verifiable</span>
+            <span>
+              rights layer built for <span style={{ color: "#60A5FA" }}>AI agents</span>
+            </span>
+          </div>
+
+          {/* Subtitle */}
+          <div
             style={{
               fontSize: "20px",
               fontWeight: 300,
               color: "#9CA3AF",
-              marginTop: "20px",
-              lineHeight: 1.5,
+              maxWidth: "850px",
+              lineHeight: 1.4,
             }}
           >
-            Secure decentralized provenance and automated royalty splits for creative assets
-          </p>
+            Cryptographic provenance, perceptual image signatures, and automated smart contract licensing settlement.
+          </div>
         </div>
 
-        {/* Bottom Feature Cards */}
+        {/* Bottom Ledger Card */}
         <div
           style={{
             display: "flex",
-            gap: "24px",
+            alignItems: "center",
+            justifyContent: "space-between",
             width: "100%",
-            marginTop: "40px",
+            padding: "16px 24px",
+            backgroundColor: "#14161A",
+            borderRadius: "16px",
           }}
         >
-          {/* Card 1 */}
-          <div
+          <span
             style={{
-              flex: 1,
-              background: "#14161A",
-              padding: "24px 32px",
-              borderRadius: "20px",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-start",
+              fontFamily: "monospace",
+              fontSize: "14px",
+              color: "#60A5FA",
             }}
           >
-            <span
-              style={{
-                fontSize: "12px",
-                fontWeight: 700,
-                color: "#60A5FA",
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-              }}
-            >
-              Provenance Registry
-            </span>
-            <span
-              style={{
-                fontSize: "16px",
-                fontWeight: 300,
-                color: "#9CA3AF",
-                marginTop: "8px",
-              }}
-            >
-              Anchor original works and track creative lineage records
-            </span>
-          </div>
+            0x933e2acc3852590a954bea93b692802dae88aaa21ac40ddb1f81462cd2a6c79b
+          </span>
 
-          {/* Card 2 */}
-          <div
-            style={{
-              flex: 1,
-              background: "#14161A",
-              padding: "24px 32px",
-              borderRadius: "20px",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-start",
-            }}
-          >
-            <span
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <div
               style={{
-                fontSize: "12px",
-                fontWeight: 700,
-                color: "#60A5FA",
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
+                width: "8px",
+                height: "8px",
+                borderRadius: "9999px",
+                backgroundColor: "#34D399",
               }}
-            >
-              Royalty Splits
-            </span>
-            <span
-              style={{
-                fontSize: "16px",
-                fontWeight: 300,
-                color: "#9CA3AF",
-                marginTop: "8px",
-              }}
-            >
-              Execute trustless split payments directly on chain
+            />
+            <span style={{ fontSize: "13px", color: "#34D399" }}>
+              Ledger Verified
             </span>
           </div>
         </div>
@@ -204,16 +192,6 @@ export default async function Image() {
     ),
     {
       ...size,
-      fonts: fontData
-        ? [
-            {
-              name: "Google Sans Flex",
-              data: fontData,
-              style: "normal",
-              weight: 400,
-            },
-          ]
-        : [],
     }
   );
 }

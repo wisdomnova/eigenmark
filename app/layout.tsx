@@ -14,11 +14,20 @@ export const metadata: Metadata = {
     siteName: "ProofChain",
     locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "ProofChain - The machine verifiable rights layer built for AI agents",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "ProofChain Creative Provenance Registry",
     description: "Secure decentralized provenance and automated royalty splits for creative assets",
+    images: ["/og.png"],
   },
   icons: {
     icon: [
