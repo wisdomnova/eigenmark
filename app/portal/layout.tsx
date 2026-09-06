@@ -81,7 +81,7 @@ function PortalContent({ children }: { children: React.ReactNode }) {
       {/* Mobile Header */}
       <header className="lg:hidden flex items-center justify-between px-6 h-16 bg-surface fixed top-0 left-0 right-0 z-30 select-none">
         <span className="text-base font-light tracking-tight text-text-primary">
-          ProofChain
+          Eigenmark
         </span>
         <button
           onClick={() => setIsSidebarOpen(true)}

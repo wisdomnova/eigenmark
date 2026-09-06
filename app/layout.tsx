@@ -4,14 +4,14 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://proofchain-omega.vercel.app"),
-  title: "ProofChain Creative Provenance Registry",
-  description: "Secure decentralized provenance and automated royalty splits for creative assets",
+  metadataBase: new URL("https://eigenmark.vercel.app"),
+  title: "Eigenmark | Machine Verifiable Rights Layer for AI Agents",
+  description: "Eigenmark registers creative assets, computes visual and cryptographic signatures, and exposes standard rights interfaces to AI agents using the Model Context Protocol.",
   openGraph: {
-    title: "ProofChain Creative Provenance Registry",
-    description: "Secure decentralized provenance and automated royalty splits for creative assets",
-    url: "https://proofchain-omega.vercel.app",
-    siteName: "ProofChain",
+    title: "Eigenmark | Machine Verifiable Rights Layer for AI Agents",
+    description: "Eigenmark registers creative assets, computes visual and cryptographic signatures, and exposes standard rights interfaces to AI agents using the Model Context Protocol.",
+    url: "https://eigenmark.vercel.app",
+    siteName: "Eigenmark",
     locale: "en_US",
     type: "website",
     images: [
@@ -19,14 +19,14 @@ export const metadata: Metadata = {
         url: "/og.png",
         width: 1200,
         height: 630,
-        alt: "ProofChain - The machine verifiable rights layer built for AI agents",
+        alt: "Eigenmark - The machine verifiable rights layer built for AI agents",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ProofChain Creative Provenance Registry",
-    description: "Secure decentralized provenance and automated royalty splits for creative assets",
+    title: "Eigenmark | Machine Verifiable Rights Layer for AI Agents",
+    description: "Eigenmark registers creative assets, computes visual and cryptographic signatures, and exposes standard rights interfaces to AI agents using the Model Context Protocol.",
     images: ["/og.png"],
   },
   icons: {
@@ -54,8 +54,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebSite",
-              "name": "ProofChain",
-              "url": "https://proofchain-omega.vercel.app",
+              "name": "Eigenmark",
+              "url": "https://eigenmark.vercel.app",
             }),
           }}
         />

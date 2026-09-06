@@ -1,7 +1,7 @@
 {
-  "name": "proofchain-mcp-server",
+  "name": "eigenmark-mcp-server",
   "version": "1.0.0",
-  "description": "ProofChain Model Context Protocol (MCP) Server for AI Agents",
+  "description": "Eigenmark Model Context Protocol (MCP) Server for AI Agents",
   "main": "index.js",
   "type": "module",
   "scripts": {

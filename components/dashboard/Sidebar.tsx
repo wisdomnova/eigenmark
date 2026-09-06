@@ -68,7 +68,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
             onClick={onClose}
             className="text-lg font-light tracking-tight text-text-primary hover:text-brand transition-colors duration-200 cursor-pointer block"
           >
-            ProofChain
+            Eigenmark
           </Link>
           <button
             onClick={onClose}

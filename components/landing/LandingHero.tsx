@@ -27,9 +27,9 @@ export default function LandingHero({ onEnterPortal }: LandingHeroProps) {
       {/* Navigation Header */}
       <header className="fixed top-0 left-0 right-0 h-16 bg-surface/80 backdrop-blur-md flex items-center justify-between px-8 z-50">
         <div className="flex items-center gap-3">
-          <img src="/logo.svg" alt="ProofChain Logo" className="w-8 h-8 object-contain" />
+          <img src="/logo.svg" alt="Eigenmark Logo" className="w-8 h-8 object-contain" />
           <span className="text-xl font-light tracking-tight text-text-primary">
-            ProofChain
+            Eigenmark
           </span>
         </div>
         <div className="flex items-center gap-4">
@@ -71,7 +71,7 @@ export default function LandingHero({ onEnterPortal }: LandingHeroProps) {
       <div className="max-w-5xl mt-16 flex flex-col items-center">
         {/* Large Brand Emblem */}
         <div className="w-20 h-20 sm:w-24 sm:h-24 mb-6 flex items-center justify-center">
-          <img src="/logo.svg" alt="ProofChain" className="w-full h-full object-contain" />
+          <img src="/logo.svg" alt="Eigenmark" className="w-full h-full object-contain" />
         </div>
 
         <span className="text-xs uppercase tracking-widest text-brand font-normal mb-4">
@@ -81,7 +81,7 @@ export default function LandingHero({ onEnterPortal }: LandingHeroProps) {
           The machine verifiable rights layer built for AI agents
         </h1>
         <p className="text-sm sm:text-base font-light text-text-muted max-w-3xl leading-relaxed mb-8">
-          ProofChain registers assets, computes visual and cryptographic signatures, uploads media to serverless storage, and exposes standard rights interfaces to AI agents using the Model Context Protocol.
+          Eigenmark registers assets, computes visual and cryptographic signatures, uploads media to serverless storage, and exposes standard rights interfaces to AI agents using the Model Context Protocol.
         </p>
 
         {/* Call to Action Button */}

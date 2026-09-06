@@ -24,7 +24,7 @@ pool.connect((err, client, release) => {
 
 const server = new Server(
   {
-    name: "proofchain-mcp-server",
+    name: "eigenmark-mcp-server",
     version: "1.0.0",
   },
   {
@@ -353,4 +353,4 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 // Run server using stdio transport
 const transport = new StdioServerTransport();
 await server.connect(transport);
-console.error("ProofChain Model Context Protocol (MCP) server listening on stdio");
+console.error("Eigenmark Model Context Protocol (MCP) server listening on stdio");

@@ -1,4 +1,4 @@
-/* ProofChain Database Schema */
+/* Eigenmark Database Schema */
 /* PostgreSQL migration script */
 
 CREATE TABLE IF NOT EXISTS users (

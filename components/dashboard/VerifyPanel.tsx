@@ -225,7 +225,7 @@ export default function VerifyPanel({ assets }: VerifyPanelProps) {
           Verify creative provenance
         </h2>
         <p className="text-xs font-light text-text-muted mt-1 leading-relaxed">
-          Drop any media file to compute client side cryptographic and perceptual signatures. ProofChain searches the database and smart contract ledger in real time.
+          Drop any media file to compute client side cryptographic and perceptual signatures. Eigenmark searches the database and smart contract ledger in real time.
         </p>
       </div>
 

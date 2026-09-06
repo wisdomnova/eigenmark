@@ -1,8 +1,8 @@
-# ProofChain
+# Eigenmark
 
 The machine verifiable rights layer for digital content.
 
-ProofChain enables autonomous agents, creators, and applications to discover content relationships, check usage rights, and settle royalties automatically.
+Eigenmark enables autonomous agents, creators, and applications to discover content relationships, check usage rights, and settle royalties automatically.
 
 > We do not make AI decide what is legal. We make rights machine readable so AI does not have to guess.
 
@@ -21,23 +21,23 @@ ProofChain enables autonomous agents, creators, and applications to discover con
 ## System Architecture
 
 ```
-                 PROOFCHAIN
-                     │
-    ┌────────────────┼────────────────┐
-    ▼                ▼                ▼
- Web UI           REST API        MCP Server
-    │                │                │
-    │                │                ▼
-    │                │            AI Agents
-    │                │                │
-    └────────┬───────┴────────────────┘
-             ▼
-      ProofChain Core
-             │
-    ┌────────┴────────┐
-    ▼                 ▼
-PostgreSQL        Blockchain
-(pHash Index)   (Solidity Registry)
+                  EIGENMARK
+                      │
+     ┌────────────────┼────────────────┐
+     ▼                ▼                ▼
+  Web UI           REST API        MCP Server
+     │                │                │
+     │                │                ▼
+     │                │            AI Agents
+     │                │                │
+     └────────┬───────┴────────────────┘
+              ▼
+        Eigenmark Core
+              │
+     ┌────────┴────────┐
+     ▼                 ▼
+ PostgreSQL        Blockchain
+ (pHash Index)   (Solidity Registry)
 ```
 
 ---
@@ -56,7 +56,7 @@ Our upload UI analyzes file signatures against the database. If a similar asset 
 
 ## Model Context Protocol (MCP) Tools
 
-The ProofChain MCP server exposes high level domain capabilities to agents:
+The Eigenmark MCP server exposes high level domain capabilities to agents:
 
 1. **`verify_provenance`**: Resolves registration details, creator address, block timestamp, and origin parent lineage history.
 2. **`find_related_assets`**: Performs visual similarity checks based on Hamming distance.
@@ -74,9 +74,9 @@ The ProofChain MCP server exposes high level domain capabilities to agents:
    npm install
    ```
 
-2. Run local database schema migrations:
+2. Run database schema migrations:
    ```bash
-   psql -d proofchain -f schema.sql
+   psql -d eigenmark -f schema.sql
    ```
 
 3. Start the Next.js development server:

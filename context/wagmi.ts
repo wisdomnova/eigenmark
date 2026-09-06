@@ -6,7 +6,7 @@ export const config = createConfig({
   chains: [arbitrumSepolia, localhost],
   connectors: [
     injected(),
-    coinbaseWallet({ appName: "ProofChain" }),
+    coinbaseWallet({ appName: "Eigenmark" }),
   ],
   transports: {
     [arbitrumSepolia.id]: http(),

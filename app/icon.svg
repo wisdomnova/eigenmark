@@ -1,8 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
-  <!-- Full-bleed high-visibility geometric ProofChain emblem -->
-  <path d="M 28 50 L 10 32 C 4 26 4 16 10 10 C 16 4 26 4 32 10 L 58 36 C 64 42 64 52 58 58 L 50 66" 
-        stroke="#60A5FA" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" />
-  <path d="M 72 50 L 90 68 C 96 74 96 84 90 90 C 84 96 74 96 68 90 L 42 64 C 36 58 36 48 42 42 L 50 34" 
-        stroke="#F9FAFB" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" />
-  <circle cx="50" cy="50" r="7" fill="#60A5FA" />
+  <!-- Eigenmark: Avant-Garde Minimalist Geometric Provenance Mark -->
+  <path d="M 12 24 L 46 24 C 54 24 60 30 60 38 L 60 50 C 60 58 54 64 46 64 L 12 64" 
+        stroke="#60A5FA" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 88 76 L 54 76 C 46 76 40 70 40 62 L 40 50 C 40 42 46 36 54 36 L 88 36" 
+        stroke="#F9FAFB" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="50" cy="50" r="5" fill="#60A5FA" />
+  <line x1="50" y1="14" x2="50" y2="24" stroke="#60A5FA" stroke-width="4" stroke-linecap="round" />
+  <line x1="50" y1="76" x2="50" y2="86" stroke="#F9FAFB" stroke-width="4" stroke-linecap="round" />
 </svg>

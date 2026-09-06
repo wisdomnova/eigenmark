@@ -1,6 +1,7 @@
 {
-  "name": "proofchain",
+  "name": "eigenmark",
   "version": "0.1.0",
+  "description": "Eigenmark - The Machine Verifiable Rights Layer for AI Agents",
   "private": true,
   "scripts": {
     "dev": "next dev",
