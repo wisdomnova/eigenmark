@@ -44,7 +44,7 @@ export const metadata: Metadata = {
         url: "/og.png",
         width: 1200,
         height: 630,
-        alt: "Eigenmark - The machine verifiable rights layer built for AI agents",
+        alt: "Eigenmark - The autonomous provenance and settlement protocol",
       },
     ],
   },
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Eigenmark | Machine Verifiable Rights Layer for AI Agents",
     description: "Eigenmark registers creative assets, computes visual and cryptographic signatures, and exposes standard rights interfaces to AI agents using the Model Context Protocol.",
-    images: ["/og.png"],
+    images: ["/twitter-image.png"],
   },
   icons: {
     icon: [
