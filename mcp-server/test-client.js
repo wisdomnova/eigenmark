@@ -2,7 +2,7 @@ import { spawn } from "child_process";
 import pg from "pg";
 
 const pool = new pg.Pool({
-  connectionString: "postgresql://user@localhost:5432/proofchain"
+  connectionString: process.env.DATABASE_URL || "postgresql://user@localhost:5432/eigenmark"
 });
 
 // Setup mock assets in the database for the test
